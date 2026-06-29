@@ -23,7 +23,7 @@ class Pazienza_Booking_Settings
             return;
         }
 
-        $base_url = plugin_dir_url(dirname(__DIR__));
+        $base_url = PAZIENZA_BOOKING_PLUGIN_URL;
 
         wp_enqueue_style(
             'pazienza-booking-admin',

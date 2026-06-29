@@ -25,7 +25,7 @@ if (!defined('PAZIENZA_APP_ID')) {
 
 if (!defined('PAZIENZA_SERVER_URL')) {
     define('PAZIENZA_SERVER_URL',
-        getenv('PAZIENZA_SERVER_URL') ?: get_option('pazienza_wc_server_url', 'https://server.pazienza.app')
+        getenv('PAZIENZA_SERVER_URL') ?: get_option('pazienza_wc_server_url', 'https://api.pazienza.app')
     );
 }
 
