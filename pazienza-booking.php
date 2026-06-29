@@ -153,10 +153,14 @@ function pazienza_booking_render_block(array $attributes): string
             'nonce'      => wp_create_nonce('wp_rest'),
             'restUrl'    => rest_url('pazienza-booking/v1'),
             'isLoggedIn' => $logged_in,
-            'userName'   => $user_name,
-            'userEmail'  => $user ? $user->user_email : '',
+            'userName'   => $user ? sanitize_text_field($user_name) : '',
+            'userEmail'  => $user ? sanitize_email($user->user_email) : '',
         ]);
-        $out .= "<script>window.pazienzaBookingConfig={$config};</script>";
+        wp_add_inline_script(
+            'pazienza-booking-booking-form-view-script',
+            'window.pazienzaBookingConfig=' . $config . ';',
+            'before'
+        );
         $config_injected = true;
     }
 

@@ -14,6 +14,50 @@ class Pazienza_Booking_Settings
     {
         $this->store = new Pazienza_Token_Store();
         $this->oauth = new Pazienza_OAuth($this->store);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+    }
+
+    public function enqueue_assets(string $hook): void
+    {
+        if (!str_contains($hook, 'pazienza-booking')) {
+            return;
+        }
+
+        $base_url = plugin_dir_url(dirname(__DIR__));
+
+        wp_enqueue_style(
+            'pazienza-booking-admin',
+            $base_url . 'assets/css/pazienza-admin.css',
+            [],
+            PAZIENZA_BOOKING_VERSION
+        );
+
+        wp_enqueue_script(
+            'pazienza-booking-settings',
+            $base_url . 'assets/js/pazienza-settings.js',
+            [],
+            PAZIENZA_BOOKING_VERSION,
+            true
+        );
+        $custom_fields = json_decode((string) get_option('pazienza_booking_custom_fields', '[]'), true) ?: [];
+        wp_localize_script('pazienza-booking-settings', 'pazienzaSettingsData', [
+            'fieldCount'  => count($custom_fields),
+            'labelRemove' => __('Rimuovi', 'pazienza-booking'),
+        ]);
+
+        wp_enqueue_script(
+            'pazienza-booking-resources',
+            $base_url . 'assets/js/pazienza-resources.js',
+            [],
+            PAZIENZA_BOOKING_VERSION,
+            true
+        );
+        wp_localize_script('pazienza-booking-resources', 'pazienzaResourcesData', [
+            'nonce'      => wp_create_nonce('pazienza_booking_toggle'),
+            'labelYes'   => __('Sì', 'pazienza-booking'),
+            'labelNo'    => __('No', 'pazienza-booking'),
+            'labelError' => __('Errore API', 'pazienza-booking'),
+        ]);
     }
 
     /**
@@ -121,7 +165,6 @@ class Pazienza_Booking_Settings
             $current_tab = 'connection';
         }
 
-        $this->render_styles();
         ?>
         <div class="wrap pazienza-wrap">
             <h1 class="pazienza-page-title">
@@ -166,41 +209,6 @@ class Pazienza_Booking_Settings
                 ?>
             </div>
         </div>
-        <?php
-    }
-
-    // ── Stili ─────────────────────────────────────────────────────────────────
-
-    private function render_styles(): void
-    {
-        ?>
-        <style>
-        .pazienza-wrap { max-width: 900px; }
-        .pazienza-page-title { display: flex; align-items: center; }
-        .pazienza-badge {
-            font-size: 12px; font-weight: 500; border-radius: 4px;
-            padding: 3px 10px; vertical-align: middle; margin-left: 10px;
-        }
-        .pazienza-badge-ok  { background: #edfaef; color: #007017; border: 1px solid #007017; }
-        .pazienza-badge-err { background: #fff0f0; color: #d63638; border: 1px solid #d63638; }
-        .pazienza-tab-nav { margin-bottom: 0 !important; }
-        .pazienza-panel {
-            background: #fff;
-            border: 1px solid #c3c4c7;
-            border-top: none;
-            padding: 28px 32px;
-            box-sizing: border-box;
-        }
-        .pazienza-section { margin-bottom: 32px; }
-        .pazienza-section:last-child { margin-bottom: 0; }
-        .pazienza-section h2 { margin-top: 0; padding-top: 0; font-size: 1.1em; color: #1d2327; border-bottom: 1px solid #f0f0f1; padding-bottom: 10px; }
-        .pazienza-status-row { display: flex; align-items: center; gap: 24px; padding: 16px 20px; border: 1px solid #c3c4c7; border-radius: 4px; background: #f9f9f9; margin-bottom: 20px; }
-        .pazienza-status-indicator { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .pazienza-status-indicator.ok  { color: #007017; }
-        .pazienza-status-indicator.err { color: #d63638; }
-        .pazienza-server-label { font-size: 12px; color: #646970; }
-        .pazienza-server-label code { font-size: 12px; }
-        </style>
         <?php
     }
 
@@ -449,39 +457,6 @@ class Pazienza_Booking_Settings
                 </button></p>
             </form>
         </div>
-
-        <script>
-        (function () {
-            var table = document.getElementById('pazienza-custom-fields-table').querySelector('tbody');
-            var idx   = <?php echo count($custom_fields); ?>;
-            var types = ['text', 'textarea', 'select', 'radio', 'checkbox'];
-
-            document.getElementById('pbf-add-field').addEventListener('click', function (e) {
-                e.preventDefault();
-                var opts = types.map(function (t) { return '<option value="' + t + '">' + t + '</option>'; }).join('');
-                var row  = document.createElement('tr');
-                row.innerHTML =
-                    '<td><input type="text" name="pbf_fields[' + idx + '][id]" style="width:100%" placeholder="es. fonte"></td>' +
-                    '<td><input type="text" name="pbf_fields[' + idx + '][label]" style="width:100%"></td>' +
-                    '<td><select name="pbf_fields[' + idx + '][type]" style="width:100%">' + opts + '</select></td>' +
-                    '<td><textarea name="pbf_fields[' + idx + '][options]" rows="3" style="width:100%"></textarea></td>' +
-                    '<td style="text-align:center"><input type="checkbox" name="pbf_fields[' + idx + '][required]" value="1"></td>' +
-                    '<td><a href="#" class="pbf-remove-row button button-small"><?php echo esc_js(__('Rimuovi', 'pazienza-booking')); ?></a></td>';
-                table.appendChild(row);
-                idx++;
-                bindRemove(row.querySelector('.pbf-remove-row'));
-            });
-
-            document.querySelectorAll('.pbf-remove-row').forEach(bindRemove);
-
-            function bindRemove(el) {
-                el.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    el.closest('tr').remove();
-                });
-            }
-        })();
-        </script>
         <?php
     }
 

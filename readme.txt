@@ -43,6 +43,14 @@ This plugin communicates with the Pazienza Cloud API ([https://www.pazienza.app]
 
 Data transmitted includes: client name, email, and phone number; the selected service and time slot; any custom fields completed by the client. No data is shared with third parties.
 
+== Source Code ==
+
+The human-readable source code for the compiled Gutenberg block (`blocks/booking-form/build/`) is available in the `blocks/booking-form/src/` directory included in this plugin, and on GitHub:
+
+* Repository: https://github.com/PazienzaApp/pazienza-booking
+* Block source: `blocks/booking-form/src/`
+* Build tool: `@wordpress/scripts` (webpack). Run `npm install && npm run build` inside `blocks/booking-form/` to regenerate the compiled files.
+
 == Installation ==
 
 1. Make sure the **Pazienza Core** plugin is installed and active.

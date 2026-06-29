@@ -14,6 +14,42 @@ class Pazienza_Booking_My_Account
         add_action('init',                                                 [$this, 'add_endpoint'], 0);
         add_filter('woocommerce_account_menu_items',                      [$this, 'add_menu_item']);
         add_action('woocommerce_account_' . self::ENDPOINT . '_endpoint', [$this, 'render']);
+        add_action('wp_enqueue_scripts',                                   [$this, 'enqueue_assets']);
+    }
+
+    public function enqueue_assets(): void
+    {
+        if (!is_account_page()) {
+            return;
+        }
+        $base_url = plugin_dir_url(dirname(__DIR__));
+        wp_enqueue_style(
+            'pazienza-booking-my-account',
+            $base_url . 'assets/css/pazienza-my-account.css',
+            [],
+            PAZIENZA_BOOKING_VERSION
+        );
+
+        $cancel_enabled = (bool) get_option('pazienza_booking_cancellation_enabled', false);
+        if (!$cancel_enabled) {
+            return;
+        }
+        wp_enqueue_script(
+            'pazienza-booking-my-account',
+            $base_url . 'assets/js/pazienza-my-account.js',
+            [],
+            PAZIENZA_BOOKING_VERSION,
+            true
+        );
+        wp_localize_script('pazienza-booking-my-account', 'pazienzaMyAccountData', [
+            'nonce'        => wp_create_nonce('wp_rest'),
+            'cancelUrl'    => rest_url('pazienza-booking/v1/appointments/cancel'),
+            'confirmMsg'   => __('Confermi la cancellazione di questa prenotazione?', 'pazienza-booking'),
+            'cancellingMsg'=> __('Annullamento…', 'pazienza-booking'),
+            'cancelledMsg' => __('Annullata', 'pazienza-booking'),
+            'cancelLabel'  => __('Annulla', 'pazienza-booking'),
+            'errorMsg'     => __('Errore nella cancellazione.', 'pazienza-booking'),
+        ]);
     }
 
     public function add_endpoint(): void
@@ -102,18 +138,6 @@ class Pazienza_Booking_My_Account
         $cancel_hours         = (int)  get_option('pazienza_booking_cancel_hours_before', 24);
         $local_tz             = wp_timezone();
         ?>
-        <style>
-        .pazienza-appt-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-        .pazienza-appt-table th { text-align: left; font-size: .8em; text-transform: uppercase; letter-spacing: .05em; color: #555; border-bottom: 2px solid #eee; padding: 6px 8px; }
-        .pazienza-appt-table td { padding: 10px 8px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
-        .pazienza-appt-table tr:last-child td { border-bottom: none; }
-        .pazienza-appt-service { font-weight: 600; }
-        .pazienza-appt-resource { font-size: .875em; color: #555; }
-        .pazienza-appt-cancel { font-size: .8em; color: #c0392b; text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; }
-        .pazienza-appt-cancel:hover { color: #922b21; }
-        .pazienza-appt-section-title { font-size: 1em; font-weight: 600; margin: 20px 0 8px; }
-        </style>
-
         <?php if ($upcoming): ?>
         <p class="pazienza-appt-section-title"><?php esc_html_e('Prossime prenotazioni', 'pazienza-booking'); ?></p>
         <table class="pazienza-appt-table">
@@ -200,43 +224,6 @@ class Pazienza_Booking_My_Account
         </table>
         <?php endif; ?>
 
-        <?php if ($cancellation_enabled): ?>
-        <script>
-        document.querySelectorAll('.pazienza-appt-cancel').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                if (!confirm('<?php echo esc_js(__('Confermi la cancellazione di questa prenotazione?', 'pazienza-booking')); ?>')) return;
-                btn.disabled = true;
-                btn.textContent = '<?php echo esc_js(__('Annullamento…', 'pazienza-booking')); ?>';
-
-                var nonce = '<?php echo esc_js(wp_create_nonce('wp_rest')); ?>';
-                var id    = btn.dataset.id;
-                var start = btn.dataset.start;
-                var hours = <?php echo (int) $cancel_hours; ?>;
-
-                // Ricrea il token HMAC lato server non è possibile dal client.
-                // Usa l'endpoint REST del plugin se la cancellazione è abilitata.
-                // Il token viene richiesto al server tramite l'endpoint dedicato.
-                fetch('<?php echo esc_js(rest_url('pazienza-booking/v1/appointments/cancel')); ?>', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
-                    body: JSON.stringify({ appointment_id: id }),
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.cancelled) {
-                        btn.closest('tr').style.opacity = '.4';
-                        btn.textContent = '<?php echo esc_js(__('Annullata', 'pazienza-booking')); ?>';
-                    } else {
-                        alert(data.message || '<?php echo esc_js(__('Errore nella cancellazione.', 'pazienza-booking')); ?>');
-                        btn.disabled = false;
-                        btn.textContent = '<?php echo esc_js(__('Annulla', 'pazienza-booking')); ?>';
-                    }
-                })
-                .catch(function() { btn.disabled = false; });
-            });
-        });
-        </script>
-        <?php endif; ?>
         <?php
     }
 }

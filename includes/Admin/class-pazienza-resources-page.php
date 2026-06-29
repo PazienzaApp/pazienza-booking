@@ -138,45 +138,6 @@ class Pazienza_Booking_Resources_Page
             </table>
         </div>
 
-        <script>
-        (function () {
-            var nonce = '<?php echo esc_js(wp_create_nonce('pazienza_booking_toggle')); ?>';
-
-            function toggle(action, id, value, labelEl) {
-                labelEl.querySelector('input').disabled = true;
-                fetch(ajaxurl, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: new URLSearchParams({action: action, id: id, value: value ? '1' : '0', _ajax_nonce: nonce}),
-                })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (!data.success) {
-                        alert(data.data || '<?php echo esc_js(__('Errore API', 'pazienza-booking')); ?>');
-                        labelEl.querySelector('input').checked = !value;
-                    }
-                    labelEl.querySelector('span').textContent = labelEl.querySelector('input').checked
-                        ? '<?php echo esc_js(__('Sì', 'pazienza-booking')); ?>'
-                        : '<?php echo esc_js(__('No', 'pazienza-booking')); ?>';
-                })
-                .finally(function () {
-                    labelEl.querySelector('input').disabled = false;
-                });
-            }
-
-            document.querySelectorAll('.pbf-toggle-resource').forEach(function (el) {
-                el.addEventListener('change', function () {
-                    toggle('pazienza_booking_toggle_resource', el.dataset.id, el.checked, el.closest('label'));
-                });
-            });
-
-            document.querySelectorAll('.pbf-toggle-product').forEach(function (el) {
-                el.addEventListener('change', function () {
-                    toggle('pazienza_booking_toggle_product', el.dataset.id, el.checked, el.closest('label'));
-                });
-            });
-        })();
-        </script>
         <?php
     }
 
