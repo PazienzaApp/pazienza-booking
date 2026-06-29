@@ -7,13 +7,14 @@ Requires PHP: 8.1
 Stable tag: 0.1.0
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Requires Plugins: pazienza-core
 
 Online booking form for studios and professionals using Pazienza. Gutenberg block, real-time availability, confirmation emails, and more.
 
 == Description ==
 
 **Pazienza Booking** adds a fully integrated online booking form to your WordPress site, connected to [Pazienza](https://www.pazienza.app) — the all-in-one management platform for professionals and small studios.
+
+GitHub: [https://github.com/PazienzaApp/pazienza-booking](https://github.com/PazienzaApp/pazienza-booking)
 
 Your clients can book appointments independently: they choose the service, the operator (optional), the date, and an available time slot — all directly on your website.
 
