@@ -3,4 +3,5 @@
 .distignore
 .github
 .wordpress-org
+README.md
 blocks/booking-form/node_modules
