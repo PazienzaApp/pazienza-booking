@@ -1,0 +1,27 @@
+# Dipendenze Node
+node_modules/
+blocks/booking-form/node_modules/
+
+# Cache build tool
+blocks/booking-form/node_modules/.cache/
+
+# Artefatti OS
+.DS_Store
+Thumbs.db
+
+# Log
+*.log
+npm-debug.log*
+
+# ZIP di distribuzione generati localmente
+*.zip
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Variabili d'ambiente locali (non committare segreti)
+.env
+.env.local

@@ -1,0 +1,44 @@
+{
+    "apiVersion": 3,
+    "name": "pazienza-booking/booking-form",
+    "version": "0.1.0",
+    "title": "Prenotazione Pazienza",
+    "category": "widgets",
+    "icon": "calendar-alt",
+    "description": "Form multi-step per la prenotazione di appuntamenti online.",
+    "textdomain": "pazienza-booking",
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"]
+    },
+    "attributes": {
+        "defaultServiceId": {
+            "type": "string",
+            "default": ""
+        },
+        "defaultResourceId": {
+            "type": "string",
+            "default": ""
+        },
+        "allowServiceSelect": {
+            "type": "boolean",
+            "default": true
+        },
+        "allowResourceSelect": {
+            "type": "boolean",
+            "default": true
+        },
+        "calendarMode": {
+            "type": "string",
+            "default": "full"
+        },
+        "customFields": {
+            "type": "string",
+            "default": "[]"
+        }
+    },
+    "editorScript": "file:./build/index.js",
+    "viewScript": "file:./build/view.js",
+    "style": "file:./build/style-index.css",
+    "editorStyle": "file:./build/index.css"
+}
