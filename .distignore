@@ -1,5 +1,6 @@
 .git
 .gitignore
 .distignore
+.github
 .wordpress-org
 blocks/booking-form/node_modules
