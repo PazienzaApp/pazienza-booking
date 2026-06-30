@@ -37,12 +37,12 @@ jobs:
 
       - name: Deploy to WordPress.org
         if: ${{ !inputs.dry_run }}
-        uses: 10up/action-wordpress-org-deploy@v1
-        with:
-          plugin-slug: pazienza-booking
-          svn-username: ${{ secrets.WPORG_SVN_USERNAME }}
-          svn-password: ${{ secrets.WPORG_SVN_PASSWORD }}
-          version: ${{ inputs.version }}
+        uses: 10up/action-wordpress-plugin-deploy@v2
+        env:
+          SVN_USERNAME: ${{ secrets.WP_SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WP_SVN_PASSWORD }}
+          SLUG: pazienza-booking
+          VERSION: ${{ inputs.version }}
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
