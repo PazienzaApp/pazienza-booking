@@ -37,7 +37,7 @@ jobs:
 
       - name: Deploy to WordPress.org
         if: ${{ !inputs.dry_run }}
-        uses: 10up/action-wordpress-plugin-deploy@v2
+        uses: 10up/action-wordpress-plugin-deploy@stable
         env:
           SVN_USERNAME: ${{ secrets.WP_SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.WP_SVN_PASSWORD }}
